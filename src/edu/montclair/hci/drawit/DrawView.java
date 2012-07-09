@@ -23,7 +23,7 @@ public class DrawView extends SurfaceView {
 	public ArrayList<Point> points;
 	
 	private Paint paint;
-	private int radius = 25;
+	private int radius = 20;
 	private SurfaceHolder surfaceHolder;
 	private Canvas canvas;
 	
