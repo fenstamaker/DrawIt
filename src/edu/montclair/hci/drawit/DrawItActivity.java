@@ -11,11 +11,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -29,6 +31,7 @@ public class DrawItActivity extends Activity {
 	private File storageDir;
 	
 	private ImageView imageView;
+	private DrawView drawView;
 	private Button photoButton;
 	private Button leafButton;
 	private Button nonleafButton;
@@ -40,12 +43,16 @@ public class DrawItActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
+        drawView = (DrawView) findViewById(R.id.drawView);
         imageView = (ImageView) findViewById(R.id.imageView);
         
         photoButton = (Button) findViewById(R.id.photoButton);
         leafButton = (Button) findViewById(R.id.leafButton);
         nonleafButton = (Button) findViewById(R.id.nonleafButton);
+        
+        drawView.setZOrderOnTop(true);
+        drawView.getHolder().setFormat(PixelFormat.TRANSPARENT);
         
         photoButton.setOnClickListener(takePhoto);
         
@@ -62,6 +69,7 @@ public class DrawItActivity extends Activity {
 
 		@Override
 		public void onClick(View v) {
+	        drawView.clearCanvas();
 			Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(currentPhotoFile));
 			startActivityForResult(takePhotoIntent, CAMERA_PHOTO_REQUEST);
@@ -103,4 +111,5 @@ public class DrawItActivity extends Activity {
 			super.onActivityResult(requestCode, resultCode, data);
     	}
     }
+
 }
