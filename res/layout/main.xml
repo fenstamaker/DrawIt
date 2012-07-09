@@ -11,6 +11,7 @@
           android:layout_height="fill_parent"
           android:layout_alignParentLeft="true"
           android:layout_alignParentTop="true"
+          android:scaleType="fitStart"
 		/>
       
       <edu.montclair.hci.drawit.DrawView
@@ -24,7 +25,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_alignParentBottom="true"
-          android:layout_alignParentLeft="true"
+          android:layout_toLeftOf="@+id/nonleafButton"
           android:text="Draw Leaf" />
 
       <Button
@@ -34,6 +35,14 @@
           android:layout_alignParentBottom="true"
           android:layout_alignParentRight="true"
           android:text="Draw Non-Leaf" />
+      
+      <Button
+          android:id="@+id/saveButton"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_above="@+id/nonleafButton"
+          android:layout_alignParentRight="true"
+          android:text="Save" />
 
       <Button
           android:id="@+id/photoButton"

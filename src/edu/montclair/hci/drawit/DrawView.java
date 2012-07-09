@@ -20,12 +20,16 @@ import android.view.View;
 
 public class DrawView extends SurfaceView {
 	
-	public ArrayList<Point> points;
+	public ArrayList<Point> leafPoints;
+	public ArrayList<Point> nonleafPoints;
+	
+	private boolean leaf;
 	
 	private Paint paint;
-	private int radius = 20;
+	private int radius = 4;
 	private SurfaceHolder surfaceHolder;
 	private Canvas canvas;
+	private int l = 0, t = 0, r = 0, b = 0;
 	
 	public class Point {
 		public int x;
@@ -37,15 +41,34 @@ public class DrawView extends SurfaceView {
 	}
 
 	private void init() {
-		points = new ArrayList<Point>();
+		leafPoints = new ArrayList<Point>();
+		nonleafPoints = new ArrayList<Point>();
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		paint.setARGB(255, 255, 255, 255);
+		setLeaf();
 		paint.setStrokeWidth(radius / getResources().getDisplayMetrics().density);
 		surfaceHolder = getHolder();
 	}
 	
+	public void setLeaf() {
+		paint.setARGB(255, 255, 255, 255);
+		leaf = true;
+	}
+	
+	public void setNonLeaf() {
+		paint.setARGB(255, 255, 0, 0);
+		leaf = false;
+	}
+	
+	public void setBoundaries(int l, int t, int r, int b) {
+		this.l = l;
+		this.t = t;
+		this.r = r;
+		this.b = b;
+	}
+	
 	public void clearCanvas() {
-		points.clear();
+		leafPoints.clear();
+		nonleafPoints.clear();
 		canvas = surfaceHolder.lockCanvas(null);
 		canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 		surfaceHolder.unlockCanvasAndPost(canvas);
@@ -82,10 +105,16 @@ public class DrawView extends SurfaceView {
 	}
 	
 	public void drawPoint(float x, float y) {
+		Point pt = null;
 		for ( int i = (int) (x-radius/2); i < (int) (x+radius/2); i++ ) {
 			for ( int j = (int) (y-radius/2); j < (int) (y+radius/2); j++ ) {
-				canvas.drawPoint(x, y, paint);
-				points.add(new Point(i, j));
+				if ( i >= l && i <= r && j >= t && j <= b ) {
+					canvas.drawPoint(i, j, paint);
+					if ( leaf )
+						leafPoints.add(new Point(i, j));
+					else
+						nonleafPoints.add(new Point(i, j));
+				}
 			}
 		}
 	}

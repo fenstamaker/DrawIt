@@ -8,10 +8,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,14 +32,19 @@ public class DrawItActivity extends Activity {
 	private Bitmap bitmap;
 	private File storageDir;
 	
+	public int scaleFactor;
+	
 	private ImageView imageView;
 	private DrawView drawView;
 	private Button photoButton;
 	private Button leafButton;
 	private Button nonleafButton;
+	private Button saveButton;
 	
 	private String currentPhotoPath;
 	private File currentPhotoFile;
+	
+	public ProgressDialog pd;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,11 +57,16 @@ public class DrawItActivity extends Activity {
         photoButton = (Button) findViewById(R.id.photoButton);
         leafButton = (Button) findViewById(R.id.leafButton);
         nonleafButton = (Button) findViewById(R.id.nonleafButton);
+        saveButton = (Button) findViewById(R.id.saveButton);
         
         drawView.setZOrderOnTop(true);
         drawView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        drawView.setBoundaries(0, 0, getWindowManager().getDefaultDisplay().getWidth(), getWindowManager().getDefaultDisplay().getHeight());
         
         photoButton.setOnClickListener(takePhoto);
+        leafButton.setOnClickListener(toggleLeaf);
+        nonleafButton.setOnClickListener(toggleLeaf);
+        saveButton.setOnClickListener(saveData);
         
         storageDir = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Leaves" );
         storageDir.mkdir();
@@ -64,10 +76,30 @@ public class DrawItActivity extends Activity {
         currentPhotoFile = image;
      
     }
+    
+    private OnClickListener saveData = new OnClickListener() {
+
+		public void onClick(View v) {
+			pd = ProgressDialog.show(DrawItActivity.this, "", "Saving. Please wait...", true);
+			SaveFile saveFile = new SaveFile(bitmap, drawView.leafPoints, drawView.nonleafPoints, pd);
+			saveFile.execute(new Void[0]);
+		}
+    	
+    };
+    
+    private OnClickListener toggleLeaf = new OnClickListener() {
+
+		public void onClick(View v) {
+			if ( v.getId() == leafButton.getId() )
+				drawView.setLeaf();
+			else
+				drawView.setNonLeaf();
+		}
+    	
+    };
 
     private OnClickListener takePhoto = new OnClickListener() {
 
-		@Override
 		public void onClick(View v) {
 	        drawView.clearCanvas();
 			Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -97,7 +129,7 @@ public class DrawItActivity extends Activity {
     	    int photoH = bmOptions.outHeight;
     	  
     	    // Determine how much to scale down the image
-    	    int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+    	    scaleFactor = Math.min(photoW/targetW, photoH/targetH);
     	  
     	    // Decode the image file into a Bitmap sized to fill the View
     	    bmOptions.inJustDecodeBounds = false;
@@ -106,7 +138,15 @@ public class DrawItActivity extends Activity {
     	  
     	    bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
     		
+    	    int width = bitmap.getWidth()/scaleFactor;
+    	    int height = bitmap.getHeight()/scaleFactor;
+    	    
+    	    bitmap = Bitmap.createScaledBitmap(bitmap, width+(targetH-height)/2, height+targetH-height, false);
+    	    
     		imageView.setImageBitmap(bitmap);
+    		drawView.setBoundaries( 0, 0, width+(targetH-height)/2, height+targetH-height);
+    		
+    		Log.d("SIZE", targetW + "x" + targetH + "=" + bitmap.getWidth()/scaleFactor + "x" + bitmap.getHeight()/scaleFactor);
 
 			super.onActivityResult(requestCode, resultCode, data);
     	}

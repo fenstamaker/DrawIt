@@ -18,7 +18,8 @@ public final class R {
         public static final int imageView=0x7f050000;
         public static final int leafButton=0x7f050002;
         public static final int nonleafButton=0x7f050003;
-        public static final int photoButton=0x7f050004;
+        public static final int photoButton=0x7f050005;
+        public static final int saveButton=0x7f050004;
     }
     public static final class layout {
         public static final int main=0x7f030000;
