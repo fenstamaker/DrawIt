@@ -110,13 +110,18 @@ public class DrawItActivity extends Activity {
     };    
     
     @Override
+    /**
+     * Called after camera intent is closed
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     	if ( requestCode == CAMERA_PHOTO_REQUEST && resultCode == Activity.RESULT_OK ) {
     		
     		if ( bitmap != null ) {
     			bitmap.recycle();
     		}
-    				
+    		
+    		// code from Google to resize picture ...
+    		
     		// Get the dimensions of the View
     	    int targetW = getWindowManager().getDefaultDisplay().getWidth();
     	    int targetH = getWindowManager().getDefaultDisplay().getHeight();
@@ -136,6 +141,8 @@ public class DrawItActivity extends Activity {
     	    bmOptions.inSampleSize = scaleFactor;
     	    bmOptions.inPurgeable = true;
     	  
+    	    // ... /
+    	    
     	    bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
     		
     	    int width = bitmap.getWidth()/scaleFactor;
@@ -144,7 +151,7 @@ public class DrawItActivity extends Activity {
     	    bitmap = Bitmap.createScaledBitmap(bitmap, width+(targetH-height)/2, height+targetH-height, false);
     	    
     		imageView.setImageBitmap(bitmap);
-    		drawView.setBoundaries( 0, 0, width+(targetH-height)/2, height+targetH-height);
+    		drawView.setBoundaries( 0, 0, width+(targetH-height)/2, height+targetH-height);	// set bounds of drawview to bounds of image
     		
     		Log.d("SIZE", targetW + "x" + targetH + "=" + bitmap.getWidth()/scaleFactor + "x" + bitmap.getHeight()/scaleFactor);
 

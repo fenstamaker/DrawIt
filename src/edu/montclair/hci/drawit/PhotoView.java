@@ -9,6 +9,11 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+/**
+ * Not used any more.
+ * @author gf102
+ *
+ */
 public class PhotoView extends SurfaceView {
 	
 	private Paint paint;
